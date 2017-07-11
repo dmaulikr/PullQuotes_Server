@@ -21,8 +21,7 @@ final class Post: Model {
 
     // MARK: Fluent Serialization
 
-    /// Initializes the Post from the
-    /// database row
+    /// Initializes the Post from the database row
     init(row: Row) throws {
         content = try row.get(Post.contentKey)
     }
@@ -38,8 +37,7 @@ final class Post: Model {
 // MARK: Fluent Preparation
 
 extension Post: Preparation {
-    /// Prepares a table/collection in the database
-    /// for storing Posts
+    /// Prepares a table/collection in the database for storing Posts
     static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
@@ -55,11 +53,13 @@ extension Post: Preparation {
 
 // MARK: JSON
 
-// How the model converts from / to JSON.
-// For example when:
-//     - Creating a new Post (POST /posts)
-//     - Fetching a post (GET /posts, GET /posts/:id)
-//
+/**
+ How the model converts from / to JSON.
+ For example when:
+
+ - Creating a new Post (POST /posts)
+ - Fetching a post (GET /posts, GET /posts/:id)
+ */
 extension Post: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
@@ -77,21 +77,17 @@ extension Post: JSONConvertible {
 
 // MARK: HTTP
 
-// This allows Post models to be returned
-// directly in route closures
+// This allows Post models to be returned directly in route closures
 extension Post: ResponseRepresentable { }
 
 // MARK: Update
 
-// This allows the Post model to be updated
-// dynamically by the request.
+// This allows the Post model to be updated dynamically by the request.
 extension Post: Updateable {
-    // Updateable keys are called when `post.update(for: req)` is called.
-    // Add as many updateable keys as you like here.
+    // Updateable keys are called when `post.update(for: req)` is called. Add as many updateable keys as you like here.
     public static var updateableKeys: [UpdateableKey<Post>] {
         return [
-            // If the request contains a String at key "content"
-            // the setter callback will be called.
+            // If the request contains a String at key "content" the setter callback will be called.
             UpdateableKey(Post.contentKey, String.self) { post, content in
                 post.content = content
             }
