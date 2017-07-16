@@ -3,30 +3,37 @@ import FluentProvider
 import HTTP
 
 final class Post: Model {
+    
+    //---------------------------------------------------------------------------------------
+    //MARK: - Properties
+    
     let storage = Storage()
     
-    // MARK: Properties and database keys
+    var content: String // The content of the post
     
-    /// The content of the post
-    var content: String
+    static let idKey = "id" // The column names for `id` in the database
+    static let contentKey = "content" // The column names for `content` in the database
     
-    /// The column names for `id` and `content` in the database
-    static let idKey = "id"
-    static let contentKey = "content"
-
-    /// Creates a new Post
+    //---------------------------------------------------------------------------------------
+    //MARK: - Init
+    
     init(content: String) {
         self.content = content
     }
+    
+    //---------------------------------------------------------------------------------------
+    //MARK: - Fluent Serialization
 
-    // MARK: Fluent Serialization
-
-    /// Initializes the Post from the database row
+    /**
+     Initializes the Post from the database row
+     */
     init(row: Row) throws {
         content = try row.get(Post.contentKey)
     }
 
-    // Serializes the Post to the database
+    /**
+     Serializes the Post to the database
+     */
     func makeRow() throws -> Row {
         var row = Row()
         try row.set(Post.contentKey, content)
@@ -34,10 +41,14 @@ final class Post: Model {
     }
 }
 
-// MARK: Fluent Preparation
+//-------------------------------------------------------------------------------------------
+//MARK: - Fluent Preparation
 
 extension Post: Preparation {
-    /// Prepares a table/collection in the database for storing Posts
+    
+    /**
+     Prepares a table/collection in the database for storing Posts
+     */
     static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
@@ -45,13 +56,16 @@ extension Post: Preparation {
         }
     }
 
-    /// Undoes what was done in `prepare`
+    /**
+     Undoes what was done in `prepare`
+     */
     static func revert(_ database: Database) throws {
         try database.delete(self)
     }
 }
 
-// MARK: JSON
+//-------------------------------------------------------------------------------------------
+//MARK: - JSON
 
 /**
  How the model converts from / to JSON.
@@ -75,18 +89,26 @@ extension Post: JSONConvertible {
     }
 }
 
-// MARK: HTTP
+//-------------------------------------------------------------------------------------------
+//MARK: - HTTP
 
-// This allows Post models to be returned directly in route closures
+/**
+ This allows Post models to be returned directly in route closures
+ */
 extension Post: ResponseRepresentable { }
 
-// MARK: Update
+//-------------------------------------------------------------------------------------------
+//MARK: - Update
 
-// This allows the Post model to be updated dynamically by the request.
+/**
+ This allows the Post model to be updated dynamically by the request.
+ */
 extension Post: Updateable {
+    
     // Updateable keys are called when `post.update(for: req)` is called. Add as many updateable keys as you like here.
     public static var updateableKeys: [UpdateableKey<Post>] {
         return [
+            
             // If the request contains a String at key "content" the setter callback will be called.
             UpdateableKey(Post.contentKey, String.self) { post, content in
                 post.content = content
