@@ -2,7 +2,7 @@ import Vapor
 import FluentProvider
 import HTTP
 
-final class Post: Model {
+final class Post: Model, Timestampable {
     
     //---------------------------------------------------------------------------------------
     //MARK: - Properties
