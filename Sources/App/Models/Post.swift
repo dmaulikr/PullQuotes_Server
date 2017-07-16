@@ -69,22 +69,27 @@ extension Post: Preparation {
 
 /**
  How the model converts from / to JSON.
- For example when:
-
- - Creating a new Post (POST /posts)
- - Fetching a post (GET /posts, GET /posts/:id)
  */
 extension Post: JSONConvertible {
+   
+    /**
+     Creating a new Post (POST /posts)
+     */
     convenience init(json: JSON) throws {
         try self.init(
             content: json.get(Post.contentKey)
         )
     }
     
+    /**
+     Fetching a post (GET /posts, GET /posts/:id)
+     */
     func makeJSON() throws -> JSON {
         var json = JSON()
         try json.set(Post.idKey, id)
         try json.set(Post.contentKey, content)
+        try json.set(Post.updatedAtKey, updatedAt)
+        try json.set(Post.createdAtKey, createdAt)
         return json
     }
 }
