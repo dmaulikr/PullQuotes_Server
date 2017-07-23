@@ -1,46 +1,85 @@
 import Vapor
 import HTTP
 
-/// Here we have a controller that helps facilitate
-/// RESTful interactions with our Posts table
+//-------------------------------------------------------------------------------------------
+//MARK: - Class
+
+/**
+ Here we have a controller that helps facilitate RESTful interactions with our Posts table
+ */
 final class PostController: ResourceRepresentable {
-    /// When users call 'GET' on '/posts'
-    /// it should return an index of all available posts
+
+    //---------------------------------------------------------------------------------------
+    //MARK: - Init
+    
+    /**
+     When making a controller, it is pretty flexible in that it only expects closures, this is useful for advanced scenarios, but most of the time, it should look almost identical to this implementation.
+     */
+    func makeResource() -> Resource<Post> {
+        return Resource(
+            index: self.index,
+            store: self.create,
+            show: self.show,
+            update: self.update,
+            replace: self.replace,
+            destroy: self.delete,
+            clear: self.clear
+        )
+    }
+    
+    //---------------------------------------------------------------------------------------
+    //MARK: - Helper Methods
+    
+    /**
+     When users call `GET` on `/posts` it should return an index of all available posts
+     */
     func index(req: Request) throws -> ResponseRepresentable {
         return try Post.all().makeJSON()
     }
 
-    /// When consumers call 'POST' on '/posts' with valid JSON
-    /// create and save the post
+    /**
+     When consumers call 'POST' on '/posts' with valid JSON create and save the post
+     */
     func create(request: Request) throws -> ResponseRepresentable {
-        let post = try request.post()
+        let post = try request.makePost()
         try post.save()
         return post
     }
 
-    /// When the consumer calls 'GET' on a specific resource, ie:
-    /// '/posts/13rd88' we should show that specific post
+    /**
+     When the consumer calls `GET` on a specific resource
+     
+     - Note: i.e. `/posts/13rd88` we should show that specific post
+     */
     func show(req: Request, post: Post) throws -> ResponseRepresentable {
         return post
     }
 
-    /// When the consumer calls 'DELETE' on a specific resource, ie:
-    /// 'posts/l2jd9' we should remove that resource from the database
+    /**
+     When the consumer calls `DELETE` on a specific resource
+     
+     - Note: ie: `posts/l2jd9` we should remove that resource from the database
+     */
     func delete(req: Request, post: Post) throws -> ResponseRepresentable {
         try post.delete()
         return Response(status: .ok)
     }
 
-    /// When the consumer calls 'DELETE' on the entire table, ie:
-    /// '/posts' we should remove the entire table
+    /**
+     When the consumer calls `DELETE` on the entire table
+     
+     - Note: ie: `/posts` we should remove the entire table
+     */
     func clear(req: Request) throws -> ResponseRepresentable {
         try Post.makeQuery().delete()
         return Response(status: .ok)
     }
 
-    /// When the user calls 'PATCH' on a specific resource, we should
-    /// update that resource to the new values.
+    /**
+     When the user calls 'PATCH' on a specific resource, we should update that resource to the new values.
+     */
     func update(req: Request, post: Post) throws -> ResponseRepresentable {
+        
         // See `extension Post: Updateable`
         try post.update(for: req)
 
@@ -49,16 +88,15 @@ final class PostController: ResourceRepresentable {
         return post
     }
 
-    /// When a user calls 'PUT' on a specific resource, we should replace any
-    /// values that do not exist in the request with null.
-    /// This is equivalent to creating a new Post with the same ID.
+    /**
+     When a user calls 'PUT' on a specific resource, we should replace any values that do not exist in the request with null. This is equivalent to creating a new Post with the same ID.
+     */
     func replace(req: Request, post: Post) throws -> ResponseRepresentable {
-        // First attempt to create a new Post from the supplied JSON.
-        // If any required fields are missing, this request will be denied.
-        let new = try req.post()
+        
+        // First attempt to create a new Post from the supplied JSON. If any required fields are missing, this request will be denied.
+        let new = try req.makePost()
 
-        // Update the post with all of the properties from
-        // the new post
+        // Update the post with all of the properties from the new post
         post.content = new.content
         try post.save()
 
@@ -66,35 +104,26 @@ final class PostController: ResourceRepresentable {
         return post
     }
 
-    /// When making a controller, it is pretty flexible in that it
-    /// only expects closures, this is useful for advanced scenarios, but
-    /// most of the time, it should look almost identical to this 
-    /// implementation
-    func makeResource() -> Resource<Post> {
-        return Resource(
-            index: index,
-            store: create,
-            show: show,
-            update: update,
-            replace: replace,
-            destroy: delete,
-            clear: clear
-        )
-    }
 }
 
+//-------------------------------------------------------------------------------------------
+//MARK: - Extensions
+
 extension Request {
-    /// Create a post from the JSON body
-    /// return BadRequest error if invalid 
-    /// or no JSON
-    func post() throws -> Post {
+    
+    /**
+     Create a post from the JSON body return BadRequest error if invalid or no JSON
+     */
+    func makePost() throws -> Post {
         guard let json = json else { throw Abort.badRequest }
         return try Post(json: json)
     }
+    
 }
 
-/// Since PostController doesn't require anything to 
-/// be initialized we can conform it to EmptyInitializable.
-///
-/// This will allow it to be passed by type.
+/**
+ Since PostController doesn't require anything to be initialized we can conform it to EmptyInitializable.
+ 
+ This will allow it to be passed by type.
+ */
 extension PostController: EmptyInitializable { }

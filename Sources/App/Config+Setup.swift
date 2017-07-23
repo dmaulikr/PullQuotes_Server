@@ -1,23 +1,29 @@
 import FluentProvider
 
 extension Config {
+    
     public func setup() throws {
-        // allow fuzzy conversions for these types
-        // (add your own types here)
+        
+        // allow fuzzy conversions for these types (add your own types here)
         Node.fuzzy = [Row.self, JSON.self, Node.self]
 
         try setupProviders()
         try setupPreparations()
+        
     }
     
-    /// Configure providers
+    /**
+     Configure providers
+     */
     private func setupProviders() throws {
-        try addProvider(FluentProvider.Provider.self)
+        try self.addProvider(FluentProvider.Provider.self)
     }
     
-    /// Add all models that should have their
-    /// schemas prepared before the app boots
+    /**
+     Add all models that should have their schemas prepared before the app boots
+     */
     private func setupPreparations() throws {
-        preparations.append(Post.self)
+        self.preparations.append(Post.self)
+        self.preparations.append(Pet.self)
     }
 }
