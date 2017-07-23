@@ -33,18 +33,18 @@ final class Pet: Model, Timestampable {
         self.breed = try row.get(Pet.breedKey)
     }
     
-    init(name: String, age: Int, breed: String?) {
-        self.name = name
-        self.age = age
-        self.breed = breed
-    }
-    
     func makeRow() throws -> Row {
         var row = Row()
         try row.set(Pet.nameKey, self.name)
         try row.set(Pet.ageKey, self.age)
         try row.set(Pet.breedKey, self.breed)
         return row
+    }
+    
+    init(name: String, age: Int, breed: String?) {
+        self.name = name
+        self.age = age
+        self.breed = breed
     }
     
 }
