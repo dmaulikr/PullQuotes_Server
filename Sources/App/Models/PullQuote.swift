@@ -94,3 +94,21 @@ extension PullQuote: JSONConvertible {
     }
     
 }
+
+extension PullQuote: Updateable {
+    
+    static var updateableKeys: [UpdateableKey<PullQuote>] {
+        let quote: UpdateableKey<PullQuote> = UpdateableKey(PullQuote.quoteKey, String.self) { pq, updatedQuote in
+            pq.quote = updatedQuote
+        }
+        let author: UpdateableKey<PullQuote> = UpdateableKey(PullQuote.authorKey, String.self) { pq, updatedAuthor in
+            pq.author = updatedAuthor
+        }
+        let source: UpdateableKey<PullQuote> = UpdateableKey(PullQuote.sourceKey, String.self) { pq, updatedSource in
+            pq.source = updatedSource
+        }
+        //TODO: tags array
+        return [quote, author, source]
+    }
+    
+}
