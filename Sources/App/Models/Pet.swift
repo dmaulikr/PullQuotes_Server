@@ -58,11 +58,11 @@ extension Pet: Preparation {
      Prepares a table/collection in the database for storing Posts
      */
     static func prepare(_ database: Database) throws {
-        try database.create(self) { pets in
-            pets.id()
-            pets.string(Pet.nameKey)
-            pets.int(Pet.ageKey)
-            pets.string(Pet.breedKey, optional: true)
+        try database.create(self) { pet in
+            pet.id()
+            pet.string(Pet.nameKey)
+            pet.int(Pet.ageKey)
+            pet.string(Pet.breedKey, optional: true)
         }
     }
 
@@ -95,9 +95,9 @@ extension Pet: JSONConvertible {
      */
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set(Pet.idKey, id)
-        try json.set(Pet.updatedAtKey, updatedAt)
-        try json.set(Pet.createdAtKey, createdAt)
+        try json.set(Pet.idKey, self.id)
+        try json.set(Pet.updatedAtKey, self.updatedAt)
+        try json.set(Pet.createdAtKey, self.createdAt)
         try json.set(Pet.nameKey, self.name)
         try json.set(Pet.ageKey, self.age)
         try json.set(Pet.breedKey, self.breed)
@@ -127,6 +127,6 @@ extension Pet: Updateable {
 }
 
 /**
- This allows Post models to be returned directly in route closures
+ This allows Pet models to be returned directly in route closures
  */
 extension Pet: ResponseRepresentable { }
