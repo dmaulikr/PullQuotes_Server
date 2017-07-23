@@ -46,3 +46,24 @@ final class PullQuote: Model, Timestampable {
     }
     
 }
+
+//-------------------------------------------------------------------------------------------
+//MARK: - Extensions
+
+extension PullQuote: Preparation {
+    
+    static func prepare(_ database: Database) throws {
+        try database.create(self) { pullquote in
+            pullquote.id()
+            pullquote.string(PullQuote.quoteKey)
+            pullquote.string(PullQuote.authorKey)
+            pullquote.string(PullQuote.sourceKey, optional: true)
+            // TODO: how to prep array of tags here?
+        }
+    }
+    
+    static func revert(_ database: Database) throws {
+        try database.delete(self)
+    }
+    
+}
