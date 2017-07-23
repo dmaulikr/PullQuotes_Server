@@ -45,6 +45,12 @@ final class PullQuote: Model, Timestampable {
         return row
     }
     
+    init(quote: String, author: String, source: String?) {
+        self.quote = quote
+        self.author = author
+        self.source = source
+        //TODO: tags array
+    }
 }
 
 //-------------------------------------------------------------------------------------------
@@ -64,6 +70,27 @@ extension PullQuote: Preparation {
     
     static func revert(_ database: Database) throws {
         try database.delete(self)
+    }
+    
+}
+
+extension PullQuote: JSONConvertible {
+    
+    convenience init(json: JSON) throws {
+        try self.init(quote: json.get(PullQuote.quoteKey),
+                  author: json.get(PullQuote.authorKey),
+                  source: json.get(PullQuote.sourceKey))
+    }
+    
+    func makeJSON() throws -> JSON {
+        var json = JSON()
+        try json.set(PullQuote.idKey, self.id)
+        try json.set(PullQuote.updatedAtKey, self.updatedAt)
+        try json.set(PullQuote.createdAtKey, self.createdAt)
+        try json.set(PullQuote.quoteKey, self.quote)
+        try json.set(PullQuote.authorKey, self.author)
+        try json.set(PullQuote.sourceKey, self.author)
+        return json
     }
     
 }
