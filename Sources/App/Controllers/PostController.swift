@@ -41,7 +41,7 @@ final class PostController: ResourceRepresentable {
      When consumers call 'POST' on '/posts' with valid JSON create and save the post
      */
     func create(request: Request) throws -> ResponseRepresentable {
-        let post = try request.post()
+        let post = try request.makePost()
         try post.save()
         return post
     }
@@ -94,7 +94,7 @@ final class PostController: ResourceRepresentable {
     func replace(req: Request, post: Post) throws -> ResponseRepresentable {
         
         // First attempt to create a new Post from the supplied JSON. If any required fields are missing, this request will be denied.
-        let new = try req.post()
+        let new = try req.makePost()
 
         // Update the post with all of the properties from the new post
         post.content = new.content
@@ -109,11 +109,21 @@ final class PostController: ResourceRepresentable {
 //-------------------------------------------------------------------------------------------
 //MARK: - Extensions
 
+extension Request {
+    
+    /**
+     Create a post from the JSON body return BadRequest error if invalid or no JSON
+     */
+    func makePost() throws -> Post {
+        guard let json = json else { throw Abort.badRequest }
+        return try Post(json: json)
+    }
+    
+}
+
 /**
  Since PostController doesn't require anything to be initialized we can conform it to EmptyInitializable.
  
  This will allow it to be passed by type.
  */
-extension PostController: EmptyInitializable {
-    
-}
+extension PostController: EmptyInitializable { }
