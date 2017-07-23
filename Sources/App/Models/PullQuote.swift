@@ -59,11 +59,11 @@ final class PullQuote: Model, Timestampable {
 extension PullQuote: Preparation {
     
     static func prepare(_ database: Database) throws {
-        try database.create(self) { pullquote in
-            pullquote.id()
-            pullquote.string(PullQuote.quoteKey)
-            pullquote.string(PullQuote.authorKey)
-            pullquote.string(PullQuote.sourceKey, optional: true)
+        try database.create(self) { pq in
+            pq.id()
+            pq.string(PullQuote.quoteKey)
+            pq.string(PullQuote.authorKey)
+            pq.string(PullQuote.sourceKey, optional: true)
             // TODO: how to prep array of tags here?
         }
     }
@@ -90,6 +90,7 @@ extension PullQuote: JSONConvertible {
         try json.set(PullQuote.quoteKey, self.quote)
         try json.set(PullQuote.authorKey, self.author)
         try json.set(PullQuote.sourceKey, self.author)
+        //TODO: tags array
         return json
     }
     
