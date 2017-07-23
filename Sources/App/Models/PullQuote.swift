@@ -113,3 +113,5 @@ extension PullQuote: Updateable {
     }
     
 }
+
+extension PullQuote: ResponseRepresentable { }
