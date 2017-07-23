@@ -49,6 +49,7 @@ extension Droplet {
         }
         
         try resource("posts", PostController.self)
+        try resource("pets", PetController.self)
     }
     
 }
