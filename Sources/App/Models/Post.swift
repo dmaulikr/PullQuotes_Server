@@ -11,7 +11,6 @@ final class Post: Model, Timestampable {
     
     var content: String // The content of the post
     
-    static let idKey = "id" // The column names for `id` in the database
     static let contentKey = "content" // The column names for `content` in the database
     
     //---------------------------------------------------------------------------------------
@@ -21,9 +20,6 @@ final class Post: Model, Timestampable {
         self.content = content
     }
     
-    //---------------------------------------------------------------------------------------
-    //MARK: - Fluent Serialization
-
     /**
      Initializes the Post from the database row
      */
@@ -42,7 +38,7 @@ final class Post: Model, Timestampable {
 }
 
 //-------------------------------------------------------------------------------------------
-//MARK: - Fluent Preparation
+//MARK: - Extensions
 
 extension Post: Preparation {
     
@@ -50,9 +46,9 @@ extension Post: Preparation {
      Prepares a table/collection in the database for storing Posts
      */
     static func prepare(_ database: Database) throws {
-        try database.create(self) { builder in
-            builder.id()
-            builder.string(Post.contentKey)
+        try database.create(self) { post in
+            post.id()
+            post.string(Post.contentKey)
         }
     }
 
@@ -64,9 +60,6 @@ extension Post: Preparation {
     }
 }
 
-//-------------------------------------------------------------------------------------------
-//MARK: - JSON
-
 /**
  How the model converts from / to JSON.
  */
@@ -76,9 +69,7 @@ extension Post: JSONConvertible {
      Creating a new Post (POST /posts)
      */
     convenience init(json: JSON) throws {
-        try self.init(
-            content: json.get(Post.contentKey)
-        )
+        try self.init(content: json.get(Post.contentKey))
     }
     
     /**
@@ -93,17 +84,6 @@ extension Post: JSONConvertible {
         return json
     }
 }
-
-//-------------------------------------------------------------------------------------------
-//MARK: - HTTP
-
-/**
- This allows Post models to be returned directly in route closures
- */
-extension Post: ResponseRepresentable { }
-
-//-------------------------------------------------------------------------------------------
-//MARK: - Update
 
 /**
  This allows the Post model to be updated dynamically by the request.
@@ -121,3 +101,8 @@ extension Post: Updateable {
         ]
     }
 }
+
+/**
+ This allows Post models to be returned directly in route closures
+ */
+extension Post: ResponseRepresentable { }
