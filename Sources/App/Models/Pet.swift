@@ -60,8 +60,9 @@ extension Pet: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { pets in
             pets.id()
-            pets.string("name")
-            pets.int("age")
+            pets.string(Pet.nameKey)
+            pets.int(Pet.ageKey)
+            pets.string(Pet.breedKey, optional: true)
         }
     }
 
