@@ -18,28 +18,33 @@ final class Pet: Model, Timestampable {
     let storage = Storage()
     var name: String
     var age: Int
+    var breed: String?
     
     static let nameKey = "name"
     static let ageKey = "age"
+    static let breedKey = "breed"
     
     //---------------------------------------------------------------------------------------
     //MARK: - Init
     
     init(row: Row) throws {
-        self.name = try row.get("name")
-        self.age = try row.get("age")
-    }
-    
-    init(name: String, age: Int) {
-        self.name = name
-        self.age = age
+        self.name = try row.get(Pet.nameKey)
+        self.age = try row.get(Pet.ageKey)
+        self.breed = try row.get(Pet.breedKey)
     }
     
     func makeRow() throws -> Row {
         var row = Row()
-        try row.set("name", self.name)
-        try row.set("age", self.age)
+        try row.set(Pet.nameKey, self.name)
+        try row.set(Pet.ageKey, self.age)
+        try row.set(Pet.breedKey, self.breed)
         return row
+    }
+    
+    init(name: String, age: Int, breed: String?) {
+        self.name = name
+        self.age = age
+        self.breed = breed
     }
     
 }
@@ -53,10 +58,11 @@ extension Pet: Preparation {
      Prepares a table/collection in the database for storing Posts
      */
     static func prepare(_ database: Database) throws {
-        try database.create(self) { pets in
-            pets.id()
-            pets.string("name")
-            pets.int("age")
+        try database.create(self) { pet in
+            pet.id()
+            pet.string(Pet.nameKey)
+            pet.int(Pet.ageKey)
+            pet.string(Pet.breedKey, optional: true)
         }
     }
 
@@ -75,22 +81,26 @@ extension Pet: Preparation {
 extension Pet: JSONConvertible {
     
     /**
-     Creating a new Post (POST /posts)
+     Creating a new pet (POST /posts)
      */
     convenience init(json: JSON) throws {
-        try self.init(name: json.get(Pet.nameKey), age: json.get(Pet.ageKey))
+        try self.init(
+            name: json.get(Pet.nameKey),
+            age: json.get(Pet.ageKey),
+            breed: json.get(Pet.breedKey))
     }
     
     /**
-     Fetching a post (GET /posts, GET /posts/:id)
+     Fetching a pet (GET /posts, GET /posts/:id)
      */
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set(Pet.idKey, id)
-        try json.set(Pet.updatedAtKey, updatedAt)
-        try json.set(Pet.createdAtKey, createdAt)
+        try json.set(Pet.idKey, self.id)
+        try json.set(Pet.updatedAtKey, self.updatedAt)
+        try json.set(Pet.createdAtKey, self.createdAt)
         try json.set(Pet.nameKey, self.name)
         try json.set(Pet.ageKey, self.age)
+        try json.set(Pet.breedKey, self.breed)
         return json
     }
     
@@ -108,12 +118,15 @@ extension Pet: Updateable {
         let age: UpdateableKey<Pet> = UpdateableKey(Pet.ageKey, Int.self) { pet, updatedAge in
             pet.age = updatedAge
         }
-        return [name, age]
+        let breed: UpdateableKey<Pet> = UpdateableKey(Pet.breedKey, String.self) { pet, updatedBreed in
+            pet.breed = updatedBreed
+        }
+        return [name, age, breed]
     }
     
 }
 
 /**
- This allows Post models to be returned directly in route closures
+ This allows Pet models to be returned directly in route closures
  */
 extension Pet: ResponseRepresentable { }

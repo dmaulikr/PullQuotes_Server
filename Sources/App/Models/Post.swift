@@ -16,10 +16,6 @@ final class Post: Model, Timestampable {
     //---------------------------------------------------------------------------------------
     //MARK: - Init
     
-    init(content: String) {
-        self.content = content
-    }
-    
     /**
      Initializes the Post from the database row
      */
@@ -35,6 +31,11 @@ final class Post: Model, Timestampable {
         try row.set(Post.contentKey, content)
         return row
     }
+    
+    init(content: String) {
+        self.content = content
+    }
+    
 }
 
 //-------------------------------------------------------------------------------------------
