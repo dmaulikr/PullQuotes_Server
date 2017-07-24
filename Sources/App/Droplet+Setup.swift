@@ -50,6 +50,7 @@ extension Droplet {
         
         try resource("posts", PostController.self)
         try resource("pets", PetController.self)
+        try resource("pullquotes", PullQuoteController.self)
     }
     
 }
