@@ -25,5 +25,6 @@ extension Config {
     private func setupPreparations() throws {
         self.preparations.append(Post.self)
         self.preparations.append(Pet.self)
+        self.preparations.append(PullQuote.self)
     }
 }
