@@ -77,7 +77,7 @@ final class PetController: ResourceRepresentable {
 extension Request {
     
     func makePet() throws -> Pet {
-        guard let json = json else { throw Abort.badRequest }
+        guard let json = self.json else { throw Abort.badRequest }
         return try Pet(json: json)
     }
     
