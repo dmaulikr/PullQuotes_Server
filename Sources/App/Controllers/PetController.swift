@@ -74,4 +74,7 @@ final class PetController: ResourceRepresentable {
     
 }
 
+//-------------------------------------------------------------------------------------------
+//MARK: - Extensions
+
 extension PetController: EmptyInitializable { }
