@@ -89,7 +89,7 @@ extension PullQuote: JSONConvertible {
         try json.set(PullQuote.createdAtKey, self.createdAt)
         try json.set(PullQuote.quoteKey, self.quote)
         try json.set(PullQuote.authorKey, self.author)
-        try json.set(PullQuote.sourceKey, self.author)
+        try json.set(PullQuote.sourceKey, self.source)
         //TODO: tags array
         return json
     }
