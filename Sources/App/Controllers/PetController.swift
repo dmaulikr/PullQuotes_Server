@@ -38,7 +38,10 @@ final class PetController: ResourceRepresentable {
      When consumers call 'POST' on '/pets' with valid JSON create and save the resource
      */
     func create(request: Request) throws -> ResponseRepresentable {
-        let pet = try request.makePet()
+        guard let json = request.json else {
+            throw Abort.badRequest
+        }
+        let pet = try Pet(json: json)
         try pet.save()
         return pet
     }
@@ -67,18 +70,6 @@ final class PetController: ResourceRepresentable {
         var jsonResponse = JSON()
         try jsonResponse.set("message", "successfully deleted")
         return try Response(status: .ok, json: jsonResponse)
-    }
-    
-}
-
-//-------------------------------------------------------------------------------------------
-//MARK: - Extensions
-
-extension Request {
-    
-    func makePet() throws -> Pet {
-        guard let json = self.json else { throw Abort.badRequest }
-        return try Pet(json: json)
     }
     
 }
