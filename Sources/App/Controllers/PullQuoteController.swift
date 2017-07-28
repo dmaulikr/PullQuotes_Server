@@ -20,6 +20,7 @@ final class PullQuoteController: ResourceRepresentable {
             store: self.create, //POST
             show: self.show, //GET
             update: self.update, //PATCH
+            replace: self.replace, //PUT
             destroy: self.delete //DELETE
         )
     }
@@ -48,7 +49,18 @@ final class PullQuoteController: ResourceRepresentable {
         try pullQuote.update(for: request)
         try pullQuote.save()
         return pullQuote
-        //TODO: what if i want to update a property to nil?
+    }
+    
+    func replace(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        guard let json = request.json else {
+            throw Abort.badRequest
+        }
+        let new = try PullQuote(json: json)
+        pullQuote.quote = new.quote
+        pullQuote.author = new.author
+        pullQuote.source = new.source
+        try pullQuote.save()
+        return pullQuote
     }
     
     func delete(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
