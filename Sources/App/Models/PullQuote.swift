@@ -61,7 +61,7 @@ extension PullQuote: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { pq in
             pq.id()
-            pq.string(PullQuote.quoteKey)
+            pq.string(PullQuote.quoteKey, length: 1500)
             pq.string(PullQuote.authorKey)
             pq.string(PullQuote.sourceKey, optional: true)
             // TODO: how to prep array of tags here?
