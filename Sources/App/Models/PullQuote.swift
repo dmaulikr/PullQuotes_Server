@@ -20,11 +20,14 @@ final class PullQuote: Model, Timestampable {
     var author: String
     var source: String?
 //    var tags: [String]?
+    var tags: Siblings<PullQuote, Tag, Pivot<PullQuote, Tag>>? {
+        return siblings()
+    }
     
     static let quoteKey = "quote"
     static let authorKey = "author"
     static let sourceKey = "source"
-//    static let tagsKey = "tags"
+    static let tagsKey = "tags"
     
     //---------------------------------------------------------------------------------------
     //MARK: - Init
