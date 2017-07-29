@@ -27,5 +27,7 @@ extension Config {
         self.preparations.append(Post.self)
         self.preparations.append(Pet.self)
         self.preparations.append(PullQuote.self)
+        self.preparations.append(Tag.self)
+        self.preparations.append(Pivot<PullQuote, Tag>.self)
     }
 }
