@@ -19,10 +19,10 @@ final class PullQuote: Model, Timestampable {
     var quote: String
     var author: String
     var source: String?
-//    var tags: [String]?
-    var tags: Siblings<PullQuote, Tag, Pivot<PullQuote, Tag>>? {
+    var tags: Siblings<PullQuote, Tag, Pivot<PullQuote, Tag>> {
         return siblings()
     }
+    var tagArray: [String]?
     
     static let quoteKey = "quote"
     static let authorKey = "author"
@@ -48,12 +48,27 @@ final class PullQuote: Model, Timestampable {
         return row
     }
     
-    init(quote: String, author: String, source: String?) {
+    init(quote: String, author: String, source: String?, tags: [String]?) {
         self.quote = quote
         self.author = author
         self.source = source
-        //TODO: tags array
+        self.tagArray = tags
     }
+    
+    //---------------------------------------------------------------------------------------
+    //MARK: - Helper Methods
+    
+    func saveTagsAndRelationships() throws {
+        guard let tags = tagArray else { return }
+        try tags.forEach {
+            let tag = Tag(name: $0)
+            try tag.save()
+            
+            let pivot = try Pivot<PullQuote, Tag>(self, tag)
+            try pivot.save()
+        }
+    }
+    
 }
 
 //-------------------------------------------------------------------------------------------
@@ -67,7 +82,6 @@ extension PullQuote: Preparation {
             pq.string(PullQuote.quoteKey, length: 1500)
             pq.string(PullQuote.authorKey)
             pq.string(PullQuote.sourceKey, optional: true)
-            // TODO: how to prep array of tags here?
         }
     }
     
@@ -82,7 +96,8 @@ extension PullQuote: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(quote: json.get(PullQuote.quoteKey),
                   author: json.get(PullQuote.authorKey),
-                  source: json.get(PullQuote.sourceKey))
+                  source: json.get(PullQuote.sourceKey),
+                  tags: json.get(PullQuote.tagsKey))
     }
     
     func makeJSON() throws -> JSON {
@@ -93,7 +108,7 @@ extension PullQuote: JSONConvertible {
         try json.set(PullQuote.quoteKey, self.quote)
         try json.set(PullQuote.authorKey, self.author)
         try json.set(PullQuote.sourceKey, self.source)
-        try json.set(PullQuote.tagsKey, try self.tags?.all().makeJSON())
+        try json.set(PullQuote.tagsKey, try self.tags.all().makeJSON())
         return json
     }
     
