@@ -8,7 +8,6 @@
 
 import Foundation
 import Vapor
-import Fluent
 
 final class PullQuoteController: ResourceRepresentable {
     
@@ -37,19 +36,9 @@ final class PullQuoteController: ResourceRepresentable {
         guard let json = request.json else {
             throw Abort.badRequest
         }
-        
         let pq = try PullQuote(json: json)
         try pq.save()
-        
-        let tags: [String] = try json.get("tags")
-        try tags.forEach {
-            let tag = Tag(name: $0)
-            try tag.save()
-            
-            let pivot = try Pivot<PullQuote, Tag>(pq, tag)
-            try pivot.save()
-        }
-        
+        try pq.saveTagsAndRelationships()
         return pq
     }
     
