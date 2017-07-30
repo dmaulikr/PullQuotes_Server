@@ -16,7 +16,7 @@ final class Tag: Model {
     //MARK: - Properties
     
     let storage = Storage()
-    let name: String
+    var name: String
     
     static let nameKey = "name"
     
@@ -69,4 +69,15 @@ extension Tag: JSONConvertible {
         try json.set(Tag.nameKey, self.name)
         return json
     }
+}
+
+extension Tag: Updateable {
+    
+    static var updateableKeys: [UpdateableKey<Tag>] {
+        let name: UpdateableKey<Tag> = UpdateableKey(Tag.nameKey, String.self) { tag, updatedName in
+            tag.name = updatedName
+        }
+        return [name]
+    }
+    
 }
