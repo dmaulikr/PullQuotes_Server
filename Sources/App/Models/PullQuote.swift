@@ -54,10 +54,10 @@ final class PullQuote: Model, Timestampable {
     }
     
     //---------------------------------------------------------------------------------------
-    //MARK: - Helper Methods
+    //MARK: - Tag Relationship Methods
     
-    func saveTagsAndRelationships() throws {
-        guard let tags = tagArray else { return }
+    func saveNewTags() throws {
+        guard let tags = self.tagArray else { return }
         try tags.forEach {
             let tag = Tag(name: $0)
             try tag.save()
@@ -65,6 +65,18 @@ final class PullQuote: Model, Timestampable {
             let pivot = try Pivot<PullQuote, Tag>(self, tag)
             try pivot.save()
         }
+    }
+    
+    func removeTags() throws {
+        let currentTags = try self.tags.all()
+        for tag in currentTags {
+            try self.tags.remove(tag)
+        }
+    }
+    
+    func updateTags() throws {
+        try self.removeTags()
+        try self.saveNewTags()
     }
     
 }
