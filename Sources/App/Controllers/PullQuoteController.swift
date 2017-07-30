@@ -65,6 +65,10 @@ final class PullQuoteController: ResourceRepresentable {
     }
     
     func delete(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        let attachedTags = try pullQuote.tags.all()
+        for tag in attachedTags {
+            try pullQuote.tags.remove(tag)
+        }
         try pullQuote.delete()
         var json = JSON()
         try json.set("message", "successfully deleted")
