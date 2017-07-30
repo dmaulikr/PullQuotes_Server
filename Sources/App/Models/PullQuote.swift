@@ -56,11 +56,16 @@ final class PullQuote: Model, Timestampable {
     //---------------------------------------------------------------------------------------
     //MARK: - Tag Relationship Methods
     
-    func saveNewTags() throws {
+    func saveTags() throws {
         guard let tags = self.tagArray else { return }
         try tags.forEach {
-            let tag = Tag(name: $0)
-            try tag.save()
+            var tag = Tag(name: $0)
+            let query = try Tag.makeQuery().filter(Tag.nameKey, .equals, tag.name)
+            if let existingTag = try query.first() {
+                tag = existingTag
+            } else {
+                try tag.save()
+            }
             
             let pivot = try Pivot<PullQuote, Tag>(self, tag)
             try pivot.save()
@@ -76,7 +81,7 @@ final class PullQuote: Model, Timestampable {
     
     func updateTags() throws {
         try self.removeTags()
-        try self.saveNewTags()
+        try self.saveTags()
     }
     
 }

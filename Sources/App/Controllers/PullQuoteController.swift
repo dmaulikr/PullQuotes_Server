@@ -38,7 +38,7 @@ final class PullQuoteController: ResourceRepresentable {
         }
         let pq = try PullQuote(json: json)
         try pq.save()
-        try pq.saveNewTags()
+        try pq.saveTags()
         return pq
     }
     
