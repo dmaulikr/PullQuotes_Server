@@ -36,7 +36,6 @@ final class PullQuote: Model, Timestampable {
         self.quote = try row.get(PullQuote.quoteKey)
         self.author = try row.get(PullQuote.authorKey)
         self.source = try row.get(PullQuote.sourceKey)
-//        self.tags = try row.get(PullQuote.tagsKey)
     }
     
     func makeRow() throws -> Row {
@@ -44,7 +43,6 @@ final class PullQuote: Model, Timestampable {
         try row.set(PullQuote.quoteKey, self.quote)
         try row.set(PullQuote.authorKey, self.author)
         try row.set(PullQuote.sourceKey, self.source)
-//        try row.set(PullQuote.tagsKey, self.tags)
         return row
     }
     
@@ -126,7 +124,6 @@ extension PullQuote: Updateable {
         let source: UpdateableKey<PullQuote> = UpdateableKey(PullQuote.sourceKey, String.self) { pq, updatedSource in
             pq.source = updatedSource
         }
-        //TODO: tags array
         return [quote, author, source]
     }
     
