@@ -38,7 +38,7 @@ final class PullQuoteController: ResourceRepresentable {
         }
         let pq = try PullQuote(json: json)
         try pq.save()
-        try pq.saveTagsAndRelationships()
+        try pq.saveNewTags()
         return pq
     }
     
@@ -60,15 +60,14 @@ final class PullQuoteController: ResourceRepresentable {
         pullQuote.quote = new.quote
         pullQuote.author = new.author
         pullQuote.source = new.source
+        pullQuote.tagArray = new.tagArray
         try pullQuote.save()
+        try pullQuote.updateTags()
         return pullQuote
     }
     
     func delete(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
-        let attachedTags = try pullQuote.tags.all()
-        for tag in attachedTags {
-            try pullQuote.tags.remove(tag)
-        }
+        try pullQuote.removeTags()
         try pullQuote.delete()
         var json = JSON()
         try json.set("message", "successfully deleted")
