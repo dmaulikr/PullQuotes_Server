@@ -26,7 +26,7 @@ final class PullQuoteController: ResourceRepresentable {
     }
     
     //---------------------------------------------------------------------------------------
-    //MARK: - Helper Methods
+    //MARK: - Resource Methods
     
     func index(request: Request) throws -> ResponseRepresentable {
         return try PullQuote.all().makeJSON()
@@ -38,6 +38,7 @@ final class PullQuoteController: ResourceRepresentable {
         }
         let pq = try PullQuote(json: json)
         try pq.save()
+        try pq.saveTags()
         return pq
     }
     
@@ -59,11 +60,14 @@ final class PullQuoteController: ResourceRepresentable {
         pullQuote.quote = new.quote
         pullQuote.author = new.author
         pullQuote.source = new.source
+        pullQuote.tagArray = new.tagArray
         try pullQuote.save()
+        try pullQuote.updateTags()
         return pullQuote
     }
     
     func delete(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try pullQuote.removeTags()
         try pullQuote.delete()
         var json = JSON()
         try json.set("message", "successfully deleted")

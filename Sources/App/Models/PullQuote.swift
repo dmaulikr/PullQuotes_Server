@@ -19,12 +19,15 @@ final class PullQuote: Model, Timestampable {
     var quote: String
     var author: String
     var source: String?
-//    var tags: [String]?
+    var tags: Siblings<PullQuote, Tag, Pivot<PullQuote, Tag>> {
+        return siblings()
+    }
+    var tagArray: [String]?
     
     static let quoteKey = "quote"
     static let authorKey = "author"
     static let sourceKey = "source"
-//    static let tagsKey = "tags"
+    static let tagsKey = "tags"
     
     //---------------------------------------------------------------------------------------
     //MARK: - Init
@@ -33,7 +36,6 @@ final class PullQuote: Model, Timestampable {
         self.quote = try row.get(PullQuote.quoteKey)
         self.author = try row.get(PullQuote.authorKey)
         self.source = try row.get(PullQuote.sourceKey)
-//        self.tags = try row.get(PullQuote.tagsKey)
     }
     
     func makeRow() throws -> Row {
@@ -41,16 +43,47 @@ final class PullQuote: Model, Timestampable {
         try row.set(PullQuote.quoteKey, self.quote)
         try row.set(PullQuote.authorKey, self.author)
         try row.set(PullQuote.sourceKey, self.source)
-//        try row.set(PullQuote.tagsKey, self.tags)
         return row
     }
     
-    init(quote: String, author: String, source: String?) {
+    init(quote: String, author: String, source: String?, tags: [String]?) {
         self.quote = quote
         self.author = author
         self.source = source
-        //TODO: tags array
+        self.tagArray = tags
     }
+    
+    //---------------------------------------------------------------------------------------
+    //MARK: - Tag Relationship Methods
+    
+    func saveTags() throws {
+        guard let tags = self.tagArray else { return }
+        try tags.forEach {
+            var tag = Tag(name: $0)
+            let query = try Tag.makeQuery().filter(Tag.nameKey, .equals, tag.name)
+            if let existingTag = try query.first() {
+                tag = existingTag
+            } else {
+                try tag.save()
+            }
+            
+            let pivot = try Pivot<PullQuote, Tag>(self, tag)
+            try pivot.save()
+        }
+    }
+    
+    func removeTags() throws {
+        let currentTags = try self.tags.all()
+        for tag in currentTags {
+            try self.tags.remove(tag)
+        }
+    }
+    
+    func updateTags() throws {
+        try self.removeTags()
+        try self.saveTags()
+    }
+    
 }
 
 //-------------------------------------------------------------------------------------------
@@ -64,7 +97,6 @@ extension PullQuote: Preparation {
             pq.string(PullQuote.quoteKey, length: 1500)
             pq.string(PullQuote.authorKey)
             pq.string(PullQuote.sourceKey, optional: true)
-            // TODO: how to prep array of tags here?
         }
     }
     
@@ -79,7 +111,8 @@ extension PullQuote: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(quote: json.get(PullQuote.quoteKey),
                   author: json.get(PullQuote.authorKey),
-                  source: json.get(PullQuote.sourceKey))
+                  source: json.get(PullQuote.sourceKey),
+                  tags: json.get(PullQuote.tagsKey))
     }
     
     func makeJSON() throws -> JSON {
@@ -90,7 +123,7 @@ extension PullQuote: JSONConvertible {
         try json.set(PullQuote.quoteKey, self.quote)
         try json.set(PullQuote.authorKey, self.author)
         try json.set(PullQuote.sourceKey, self.source)
-        //TODO: tags array
+        try json.set(PullQuote.tagsKey, try self.tags.all().makeJSON())
         return json
     }
     
@@ -108,7 +141,6 @@ extension PullQuote: Updateable {
         let source: UpdateableKey<PullQuote> = UpdateableKey(PullQuote.sourceKey, String.self) { pq, updatedSource in
             pq.source = updatedSource
         }
-        //TODO: tags array
         return [quote, author, source]
     }
     
