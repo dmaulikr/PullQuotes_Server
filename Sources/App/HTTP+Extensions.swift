@@ -10,7 +10,8 @@ import Vapor
 import HTTP
 
 extension HTTP.KeyAccessible where Key == HeaderKey, Value == String {
-    var accessToken: String? {
+    
+    public var accessToken: String? {
         get {
             return self["x-access-token"]
         }
@@ -18,4 +19,14 @@ extension HTTP.KeyAccessible where Key == HeaderKey, Value == String {
             self["x-access-token"] = newValue
         }
     }
+    
+    public var contentType: String? {
+        get {
+            return self["Content-Type"]
+        }
+        set {
+            self["Content-Type"] = newValue
+        }
+    }
+    
 }
