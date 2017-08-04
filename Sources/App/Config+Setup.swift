@@ -18,6 +18,8 @@ extension Config {
     private func setupProviders() throws {
         try self.addProvider(FluentProvider.Provider.self)
         try self.addProvider(PostgreSQLProvider.Provider.self)
+    private func setupMiddleware() throws {
+        self.addConfigurable(middleware: RequestVerificationMiddleware(), name: "request-verification")
     }
     
     /**
