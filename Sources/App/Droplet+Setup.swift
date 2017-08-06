@@ -11,16 +11,17 @@ import AuthProvider
 
 extension Droplet {
     
+    //---------------------------------------------------------------------------------------
+    //MARK: - Public Methods
+    
     public func setup() throws {
-        try setupRoutes()
-        // Do any additional droplet setup
+        try configureRoutes()
     }
+ 
+    //---------------------------------------------------------------------------------------
+    //MARK: - Private Methods
     
-}
-
-extension Droplet {
-    
-    func setupRoutes() throws {
+    private func configureRoutes() throws {
         let tokenMiddleware = TokenAuthenticationMiddleware(User.self)
         let groupV1Auth = self.grouped("v1").grouped([tokenMiddleware])
         try groupV1Auth.resource("quotes", PullQuoteController.self)
@@ -63,5 +64,5 @@ extension Droplet {
             return try Pet.all().description
         }
     }
-    
+
 }
