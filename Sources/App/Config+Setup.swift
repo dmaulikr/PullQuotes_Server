@@ -1,3 +1,4 @@
+import AuthProvider
 import FluentProvider
 import PostgreSQLProvider
 
@@ -14,7 +15,7 @@ extension Config {
     }
     
     private func setupMiddleware() throws {
-        self.addConfigurable(middleware: RequestVerificationMiddleware(), name: "request-verification")
+        self.addConfigurable(middleware: RedirectMiddleware.login(), name: "redirect")
     }
     
     private func setupModelSchemas() throws {

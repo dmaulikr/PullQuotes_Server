@@ -33,7 +33,7 @@
         "error",
         "date",
         "file",
-        "request-verification"
+        "redirect"
     ],
 
     "//": "Choose which commands this application can run",
