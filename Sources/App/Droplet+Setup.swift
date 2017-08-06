@@ -1,4 +1,5 @@
 @_exported import Vapor
+import AuthProvider
 
 extension Droplet {
     
@@ -12,9 +13,13 @@ extension Droplet {
 extension Droplet {
     
     func setupRoutes() throws {
-        get("hello") { req in
+        let tokenMiddleware = TokenAuthenticationMiddleware(User.self)
+        let groupV1Auth = self.grouped("v1").grouped([tokenMiddleware])
+        try groupV1Auth.resource("quotes", PullQuoteController.self)
+        
+        get("login") { req in
             var json = JSON()
-            try json.set("hello", "world")
+            try json.set("redirect", "login required - create user or refresh token here")
             return json
         }
         
@@ -50,7 +55,6 @@ extension Droplet {
         
         try resource("posts", PostController.self)
         try resource("pets", PetController.self)
-        try resource("pullquotes", PullQuoteController.self)
     }
     
 }
