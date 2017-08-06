@@ -77,6 +77,15 @@ final class PullQuoteController: ResourceRepresentable {
         return try Response(status: .ok, json: json)
     }
     
+    //---------------------------------------------------------------------------------------
+    //MARK: - Helper Methods
+    
+    fileprivate func checkForAuthorizedUser(_ request: Request, _ pullQuote: PullQuote) throws {
+        guard try request.userTokenFromAuthToken()?.id == pullQuote.userId else {
+            throw Abort.unauthorized
+        }
+    }
+    
 }
 
 //-------------------------------------------------------------------------------------------
