@@ -1,3 +1,11 @@
+//
+//  Droplet+Setup.swift
+//  PullQuotes_Server
+//
+//  Created by Daniel Hour on 7/9/17.
+//
+//
+
 @_exported import Vapor
 import AuthProvider
 
@@ -23,11 +31,10 @@ extension Droplet {
             return json
         }
         
-        get("plaintext") { req in
+        get("hello") { req in
             return "Hello, world!"
         }
         
-        // response to requests to /info domain with a description of the request
         get("info") { req in
             return req.description
         }
@@ -41,10 +48,6 @@ extension Droplet {
             return request.description
         }
         
-        get("pets") { request in
-            return try Pet.all().description
-        }
-        
         post("hello") { request in
             guard let name = request.data["name"]?.string else {
                 throw Abort(.badRequest, reason: "wrong body")
@@ -55,6 +58,10 @@ extension Droplet {
         
         try resource("posts", PostController.self)
         try resource("pets", PetController.self)
+        
+        get("pets") { request in
+            return try Pet.all().description
+        }
     }
     
 }
