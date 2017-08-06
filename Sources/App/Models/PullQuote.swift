@@ -24,6 +24,11 @@ final class PullQuote: Model, Timestampable {
     }
     var tagArray: [String]?
     
+    var userId: Identifier?
+    var user: Parent<PullQuote, User> {
+        return parent(id: self.userId)
+    }
+    
     static let quoteKey = "quote"
     static let authorKey = "author"
     static let sourceKey = "source"
@@ -97,6 +102,7 @@ extension PullQuote: Preparation {
             pq.string(PullQuote.quoteKey, length: 1500)
             pq.string(PullQuote.authorKey)
             pq.string(PullQuote.sourceKey, optional: true)
+            pq.parent(User.self)
         }
     }
     
