@@ -37,6 +37,7 @@ final class PullQuoteController: ResourceRepresentable {
             throw Abort.badRequest
         }
         let pq = try PullQuote(json: json)
+        try pq.setParent(from: request)
         try pq.save()
         try pq.saveTags()
         return pq
