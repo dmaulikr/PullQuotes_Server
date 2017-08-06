@@ -60,7 +60,12 @@ final class PullQuote: Model, Timestampable {
     }
     
     //---------------------------------------------------------------------------------------
-    //MARK: - Tag Relationship Methods
+    //MARK: - Relationship Methods
+    
+    func setParent(from request: Request) throws {
+        let userId = try request.userTokenFromAuthToken()?.id
+        self.userId = userId
+    }
     
     func saveTags() throws {
         guard let tags = self.tagArray else { return }
