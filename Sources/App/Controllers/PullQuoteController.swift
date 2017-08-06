@@ -6,7 +6,6 @@
 //
 //
 
-import Foundation
 import Vapor
 
 final class PullQuoteController: ResourceRepresentable {
@@ -29,7 +28,10 @@ final class PullQuoteController: ResourceRepresentable {
     //MARK: - Resource Methods
     
     func index(request: Request) throws -> ResponseRepresentable {
-        return try PullQuote.all().makeJSON()
+        let userToken = try request.userTokenFromAuthToken()
+        let userId = userToken?.id?.string
+        let quotesJSON = try PullQuote.makeQuery().filter(User.foreignIdKey, userId).all().makeJSON()
+        return quotesJSON
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
