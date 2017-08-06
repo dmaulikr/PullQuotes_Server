@@ -1,3 +1,11 @@
+//
+//  Config+Setup.swift
+//  PullQuotes_Server
+//
+//  Created by Daniel Hour on 7/9/17.
+//
+//
+
 import AuthProvider
 import FluentProvider
 import PostgreSQLProvider
@@ -10,17 +18,17 @@ extension Config {
         Node.fuzzy = [Row.self, JSON.self, Node.self]
 
         try setupMiddleware()
-        try setupModelSchemas()
         try setupProviders()
+        try setupSchemas()
     }
     
     private func setupMiddleware() throws {
         self.addConfigurable(middleware: RedirectMiddleware.login(), name: "redirect")
     }
     
-    private func setupModelSchemas() throws {
-        self.preparations.append(Post.self)
-        self.preparations.append(Pet.self)
+    private func setupSchemas() throws {
+        self.preparations.append(User.self)
+        self.preparations.append(Token.self)
         self.preparations.append(PullQuote.self)
         self.preparations.append(Tag.self)
         self.preparations.append(Pivot<PullQuote, Tag>.self)
