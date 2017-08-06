@@ -48,6 +48,7 @@ final class PullQuote: Model, Timestampable {
         try row.set(PullQuote.quoteKey, self.quote)
         try row.set(PullQuote.authorKey, self.author)
         try row.set(PullQuote.sourceKey, self.source)
+        try row.set(User.foreignIdKey, self.userId)
         return row
     }
     
