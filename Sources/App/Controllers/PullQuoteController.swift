@@ -46,16 +46,19 @@ final class PullQuoteController: ResourceRepresentable {
     }
     
     func show(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         return pullQuote
     }
     
     func update(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         try pullQuote.update(for: request)
         try pullQuote.save()
         return pullQuote
     }
     
     func replace(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         guard let json = request.json else {
             throw Abort.badRequest
         }
@@ -70,6 +73,7 @@ final class PullQuoteController: ResourceRepresentable {
     }
     
     func delete(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         try pullQuote.removeTags()
         try pullQuote.delete()
         var json = JSON()
