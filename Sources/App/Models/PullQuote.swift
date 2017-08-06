@@ -41,6 +41,7 @@ final class PullQuote: Model, Timestampable {
         self.quote = try row.get(PullQuote.quoteKey)
         self.author = try row.get(PullQuote.authorKey)
         self.source = try row.get(PullQuote.sourceKey)
+        self.userId = try row.get(User.foreignIdKey)
     }
     
     func makeRow() throws -> Row {
