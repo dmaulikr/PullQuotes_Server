@@ -24,6 +24,11 @@ final class PullQuote: Model, Timestampable {
     }
     var tagArray: [String]?
     
+    var userId: Identifier?
+    var user: Parent<PullQuote, User> {
+        return parent(id: self.userId)
+    }
+    
     static let quoteKey = "quote"
     static let authorKey = "author"
     static let sourceKey = "source"
@@ -36,6 +41,7 @@ final class PullQuote: Model, Timestampable {
         self.quote = try row.get(PullQuote.quoteKey)
         self.author = try row.get(PullQuote.authorKey)
         self.source = try row.get(PullQuote.sourceKey)
+        self.userId = try row.get(User.foreignIdKey)
     }
     
     func makeRow() throws -> Row {
@@ -43,6 +49,7 @@ final class PullQuote: Model, Timestampable {
         try row.set(PullQuote.quoteKey, self.quote)
         try row.set(PullQuote.authorKey, self.author)
         try row.set(PullQuote.sourceKey, self.source)
+        try row.set(User.foreignIdKey, self.userId)
         return row
     }
     
@@ -54,7 +61,12 @@ final class PullQuote: Model, Timestampable {
     }
     
     //---------------------------------------------------------------------------------------
-    //MARK: - Tag Relationship Methods
+    //MARK: - Relationship Methods
+    
+    func setParent(from request: Request) throws {
+        let userId = try request.userTokenFromAuthToken()?.id
+        self.userId = userId
+    }
     
     func saveTags() throws {
         guard let tags = self.tagArray else { return }
@@ -97,6 +109,7 @@ extension PullQuote: Preparation {
             pq.string(PullQuote.quoteKey, length: 1500)
             pq.string(PullQuote.authorKey)
             pq.string(PullQuote.sourceKey, optional: true)
+            pq.parent(User.self)
         }
     }
     

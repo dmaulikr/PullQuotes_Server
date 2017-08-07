@@ -6,7 +6,6 @@
 //
 //
 
-import Foundation
 import Vapor
 
 final class PullQuoteController: ResourceRepresentable {
@@ -29,7 +28,10 @@ final class PullQuoteController: ResourceRepresentable {
     //MARK: - Resource Methods
     
     func index(request: Request) throws -> ResponseRepresentable {
-        return try PullQuote.all().makeJSON()
+        let userToken = try request.userTokenFromAuthToken()
+        let userId = userToken?.id?.string
+        let quotesJSON = try PullQuote.makeQuery().filter(User.foreignIdKey, userId).all().makeJSON()
+        return quotesJSON
     }
     
     func create(request: Request) throws -> ResponseRepresentable {
@@ -37,22 +39,26 @@ final class PullQuoteController: ResourceRepresentable {
             throw Abort.badRequest
         }
         let pq = try PullQuote(json: json)
+        try pq.setParent(from: request)
         try pq.save()
         try pq.saveTags()
         return pq
     }
     
     func show(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         return pullQuote
     }
     
     func update(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         try pullQuote.update(for: request)
         try pullQuote.save()
         return pullQuote
     }
     
     func replace(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         guard let json = request.json else {
             throw Abort.badRequest
         }
@@ -67,11 +73,21 @@ final class PullQuoteController: ResourceRepresentable {
     }
     
     func delete(request: Request, pullQuote: PullQuote) throws -> ResponseRepresentable {
+        try checkForAuthorizedUser(request, pullQuote)
         try pullQuote.removeTags()
         try pullQuote.delete()
         var json = JSON()
         try json.set("message", "successfully deleted")
         return try Response(status: .ok, json: json)
+    }
+    
+    //---------------------------------------------------------------------------------------
+    //MARK: - Helper Methods
+    
+    fileprivate func checkForAuthorizedUser(_ request: Request, _ pullQuote: PullQuote) throws {
+        guard try request.userTokenFromAuthToken()?.id == pullQuote.userId else {
+            throw Abort.unauthorized
+        }
     }
     
 }

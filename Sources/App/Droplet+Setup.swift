@@ -1,28 +1,41 @@
+//
+//  Droplet+Setup.swift
+//  PullQuotes_Server
+//
+//  Created by Daniel Hour on 7/9/17.
+//
+//
+
 @_exported import Vapor
+import AuthProvider
 
 extension Droplet {
+    
+    //---------------------------------------------------------------------------------------
+    //MARK: - Public Methods
     
     public func setup() throws {
-        try setupRoutes()
-        // Do any additional droplet setup
+        try configureRoutes()
     }
+ 
+    //---------------------------------------------------------------------------------------
+    //MARK: - Private Methods
     
-}
-
-extension Droplet {
-    
-    func setupRoutes() throws {
-        get("hello") { req in
+    private func configureRoutes() throws {
+        let tokenMiddleware = TokenAuthenticationMiddleware(User.self)
+        let groupV1Auth = self.grouped("v1").grouped([tokenMiddleware])
+        try groupV1Auth.resource("quotes", PullQuoteController.self)
+        
+        get("login") { req in
             var json = JSON()
-            try json.set("hello", "world")
+            try json.set("redirect", "login required - create user or refresh token here")
             return json
         }
         
-        get("plaintext") { req in
+        get("hello") { req in
             return "Hello, world!"
         }
         
-        // response to requests to /info domain with a description of the request
         get("info") { req in
             return req.description
         }
@@ -36,10 +49,6 @@ extension Droplet {
             return request.description
         }
         
-        get("pets") { request in
-            return try Pet.all().description
-        }
-        
         post("hello") { request in
             guard let name = request.data["name"]?.string else {
                 throw Abort(.badRequest, reason: "wrong body")
@@ -50,7 +59,10 @@ extension Droplet {
         
         try resource("posts", PostController.self)
         try resource("pets", PetController.self)
-        try resource("pullquotes", PullQuoteController.self)
+        
+        get("pets") { request in
+            return try Pet.all().description
+        }
     }
-    
+
 }
